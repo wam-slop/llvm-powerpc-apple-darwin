@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eu
+
+host=${PPC_DARWIN_RUN_HOST:?set PPC_DARWIN_RUN_HOST to the ssh destination of a ppc Mac}
+remote_base=${PPC_DARWIN_RUN_DIR:-/tmp/ppc-darwin-run}
+program=$1
+shift
+
+read -r -a ssh_options <<< "${PPC_DARWIN_SSH_OPTIONS:-}"
+work="$remote_base/$(basename "$program").$$"
+ssh "${ssh_options[@]}" -o BatchMode=yes -o LogLevel=ERROR "$host" "mkdir -p '$work'"
+trap 'ssh "${ssh_options[@]}" -o BatchMode=yes -o LogLevel=ERROR "$host" "rm -rf '"'$work'"'"' EXIT
+
+files=("$program")
+program_dir=$(dirname "$program")
+for dylib in "$program_dir"/*.dylib; do
+    [ -e "$dylib" ] && files+=("$dylib")
+done
+tar -C / -cf - "${files[@]#/}" 2>/dev/null \
+    | ssh "${ssh_options[@]}" -o BatchMode=yes -o LogLevel=ERROR "$host" "tar -C '$work' -xf -"
+
+quoted_args=""
+for arg in "$@"; do
+    quoted_args+=" '${arg//\'/\'\\\'\'}'"
+done
+remote_program="$work/${program#/}"
+remote_dir=$(dirname "$remote_program")
+ssh "${ssh_options[@]}" -o BatchMode=yes -o LogLevel=ERROR "$host" \
+    "cd '$remote_dir' && DYLD_LIBRARY_PATH='$remote_dir' '$remote_program'$quoted_args"

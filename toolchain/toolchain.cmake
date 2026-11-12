@@ -1,0 +1,51 @@
+set(CMAKE_SYSTEM_NAME Darwin)
+set(CMAKE_SYSTEM_VERSION 9.8.0)
+if(CMAKE_OSX_ARCHITECTURES STREQUAL "i386" OR CMAKE_OSX_ARCHITECTURES STREQUAL "x86_64")
+  set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_OSX_ARCHITECTURES})
+elseif(CMAKE_OSX_ARCHITECTURES STREQUAL "ppc64")
+  set(CMAKE_SYSTEM_PROCESSOR powerpc64)
+else()
+  set(CMAKE_SYSTEM_PROCESSOR powerpc)
+endif()
+
+get_filename_component(PPC_DARWIN_PREFIX "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+set(PPC_DARWIN_TRIPLE powerpc-apple-darwin9)
+set(_ppc_darwin_tool "${PPC_DARWIN_PREFIX}/bin/${PPC_DARWIN_TRIPLE}-")
+
+set(CMAKE_C_COMPILER "${_ppc_darwin_tool}clang")
+set(CMAKE_CXX_COMPILER "${_ppc_darwin_tool}clang++")
+set(CMAKE_OBJC_COMPILER "${_ppc_darwin_tool}clang")
+set(CMAKE_OBJCXX_COMPILER "${_ppc_darwin_tool}clang++")
+set(CMAKE_ASM_COMPILER "${_ppc_darwin_tool}clang")
+
+set(CMAKE_AR "${_ppc_darwin_tool}ar" CACHE FILEPATH "")
+set(CMAKE_RANLIB "${_ppc_darwin_tool}ranlib" CACHE FILEPATH "")
+set(CMAKE_NM "${_ppc_darwin_tool}nm" CACHE FILEPATH "")
+set(CMAKE_STRIP "${_ppc_darwin_tool}strip" CACHE FILEPATH "")
+set(CMAKE_LINKER "${_ppc_darwin_tool}ld" CACHE FILEPATH "")
+set(CMAKE_INSTALL_NAME_TOOL "${_ppc_darwin_tool}install_name_tool" CACHE FILEPATH "")
+set(CMAKE_LIPO "${_ppc_darwin_tool}lipo" CACHE FILEPATH "")
+set(CMAKE_LIBTOOL "${_ppc_darwin_tool}libtool" CACHE FILEPATH "")
+set(CMAKE_OTOOL "${_ppc_darwin_tool}otool" CACHE FILEPATH "")
+
+foreach(_ppc_darwin_lang C CXX OBJC OBJCXX ASM)
+  set(CMAKE_${_ppc_darwin_lang}_CREATE_STATIC_LIBRARY
+      "\"${CMAKE_LIBTOOL}\" -static -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+endforeach()
+
+set(CMAKE_OSX_SYSROOT "${PPC_DARWIN_PREFIX}/SDKs/MacOSX10.5.sdk" CACHE PATH "")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.5" CACHE STRING "")
+set(CMAKE_OSX_ARCHITECTURES "ppc" CACHE STRING "")
+
+set(PPC_DARWIN_STAGING "${PPC_DARWIN_PREFIX}/${PPC_DARWIN_TRIPLE}" CACHE PATH
+    "where cross-built third-party libraries are installed")
+set(CMAKE_FIND_ROOT_PATH "${CMAKE_OSX_SYSROOT}" "${PPC_DARWIN_STAGING}")
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+set(PKG_CONFIG_EXECUTABLE "${_ppc_darwin_tool}pkg-config" CACHE FILEPATH "")
+
+if(DEFINED ENV{PPC_DARWIN_RUN_HOST} AND NOT CMAKE_CROSSCOMPILING_EMULATOR)
+  set(CMAKE_CROSSCOMPILING_EMULATOR "${PPC_DARWIN_PREFIX}/libexec/ppc-darwin/run-on-target")
+endif()

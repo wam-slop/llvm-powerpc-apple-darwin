@@ -1,0 +1,17 @@
+**/.git
+/build*
+/out
+*.log
+/extern/llvm-project/bolt
+/extern/llvm-project/clang-tools-extra
+/extern/llvm-project/cross-project-tests
+/extern/llvm-project/flang
+/extern/llvm-project/flang-rt
+/extern/llvm-project/libclc
+/extern/llvm-project/lld
+/extern/llvm-project/lldb
+/extern/llvm-project/mlir
+/extern/llvm-project/offload
+/extern/llvm-project/openmp
+/extern/llvm-project/polly
+/extern/llvm-project/utils/bazel

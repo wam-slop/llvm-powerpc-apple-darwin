@@ -1,0 +1,4 @@
+/build*/
+/sdks/*.sdk
+/out/
+*.log

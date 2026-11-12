@@ -1,0 +1,16 @@
+[submodule "extern/cctools"]
+	path = extern/cctools
+	url = ../cctools.git
+	branch = ppc-host
+[submodule "extern/ld64"]
+	path = extern/ld64
+	url = ../ld64.git
+	branch = ppc-host
+[submodule "extern/legacy-support"]
+	path = extern/legacy-support
+	url = ../macports-legacy-support.git
+	branch = ppc-host
+[submodule "extern/llvm-project"]
+	path = extern/llvm-project
+	url = ../llvm-project.git
+	branch = powerpc-apple-darwin
